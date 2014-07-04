@@ -1,11 +1,37 @@
 require 'date'
+require 'getoptlong'
+
+storage = ARGV.clone
+
+opts = GetoptLong.new(
+  ['--help', '-h', GetoptLong::NO_ARGUMENT],
+  ['--year', '-y', GetoptLong::OPTIONAL_ARGUMENT]
+)
+
+year = 0
+
+opts.each do |opt, arg|
+  case opt
+    when '--help'
+      puts "ruby sun.rb [--year [year]]"
+      exit
+    when '--year'
+      if arg == ''
+        year = Time.now.year
+      else
+        year = arg
+      end
+  end
+end
 
 class Location
+  attr_reader :shortname
   attr_reader :name
   attr_reader :north
   attr_reader :east
 
-  def initialize(name, north, east)
+  def initialize(shortname, name, north, east)
+    @shortname = shortname
     @name = name
     @north = north
     @east = east
@@ -18,14 +44,6 @@ end
 
 def arccos(x)
   Math.atan2(Math.sqrt(1.0-x*x),x)
-end
-
-class Float
-  def round_to(i)
-    f = (10 ** i).to_f
-    nr = self * f
-    return nr.round / f
-  end
 end
 
 class Date
@@ -77,25 +95,42 @@ class SunDeclination
 
 end
 
-bul = Location.new("Burglengenfeld", 49.197298, 12.045822)
-
-s = SunDeclination.new(bul)
-print "Sunrise: "
-puts s.sunrise_to_s
-print "Sunset:  "
-puts s.sunset_to_s
+#loc = Location.new("bul","Burglengenfeld", 49.207505, 12.042675)
+#loc = Location.new("stav","Stavanger", 58.972313, 5.732746)
+loc = Location.new("wak","Wackersdorf", 49.314604, 12.179174)
 
 
 
-#date = Date.new(2011,1,1);
+if year == 0 then
+  syesterday = SunDeclination.new(loc, Date.today-1)
+  stoday     = SunDeclination.new(loc)
+  stomorrow  = SunDeclination.new(loc, Date.today+1)
 
-#for i in 1..date.days_in_year
-  #s = SunDeclination.new(bul,date)
-  #print date
-  #print " "
-  #print s.sunrise_to_s
-  #print " "
-  #print s.sunset_to_s
-  #puts ""
-  #date = date+1
-#end
+  puts  "          Yesterday    Today    Tomorrow"
+  print "Sunrise:  "
+  print syesterday.sunrise_to_s
+  print "        "
+  print stoday.sunrise_to_s
+  print "    "
+  puts  stomorrow.sunrise_to_s
+
+  print "Sunset:   "
+  print syesterday.sunset_to_s
+  print "        "
+  print stoday.sunset_to_s
+  print "    "
+  puts stomorrow.sunset_to_s
+else
+  date = Date.new(year.to_i,1,1);
+
+  for i in 1..date.days_in_year
+    s = SunDeclination.new(loc,date)
+    print date
+    print " "
+    print s.sunrise_to_s
+    print " "
+    print s.sunset_to_s
+    puts ""
+    date = date+1
+  end
+end
