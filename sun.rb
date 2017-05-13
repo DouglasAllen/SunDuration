@@ -126,8 +126,9 @@ class SunDeclination
 end
 
 # loc = Location.new('bul', 'Burglengenfeld', 49.207505, 12.042675)
-loc = Location.new('stav', 'Stavanger', 58.972313, 5.732746)
+# loc = Location.new('stav', 'Stavanger', 58.972313, 5.732746)
 # loc = Location.new('wak', 'Wackersdorf', 49.314604, 12.179174)
+loc = Location.new('dek', 'De Kalb', 41.934, -88.75)
 
 if year == 0
   syesterday = SunDeclination.new(loc, Date.today - 1)
@@ -170,10 +171,10 @@ else
   end
 end
 
-p stoday.loc
-p stoday.date
-p stoday.daynumber
-p stoday.gmt_offset
-p stoday.timeeq * 60
-p stoday.declination * 180 / Math::PI
-p stoday.timediff
+puts "Location:    #{stoday.loc.name}, #{stoday.loc.north}, #{stoday.loc.east}"
+puts "Date:        #{stoday.date.to_s}"
+puts "Day number:  #{stoday.daynumber}"
+puts "UTC offste:  #{stoday.gmt_offset}"
+puts "EOT:         #{stoday.timeeq * 60}"
+puts "Declination: #{stoday.declination * 180 / Math::PI}"
+puts "Duration:    #{stoday.timediff * 2}"
